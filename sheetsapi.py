@@ -4,7 +4,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 import os
 import sys
 
-
 import pickle
 from time import sleep
 scope = ['https://www.googleapis.com/auth/spreadsheets',
