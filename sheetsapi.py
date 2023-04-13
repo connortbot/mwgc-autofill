@@ -1,6 +1,10 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+import os
+import sys
+
+
 import pickle
 from time import sleep
 scope = ['https://www.googleapis.com/auth/spreadsheets',
@@ -18,23 +22,14 @@ try:
 except:
     with open('userdata.pickle', 'wb') as f:
         pickle.dump(sheetnames, f)
-#use this line when compiling
-#creds = ServiceAccountCredentials.from_json_keyfile_name(r'C:\Users\MonkeyDumpling\Desktop\mwgc-autofill-main\dist\main\client_secret.json', scope)
-#use this line in IDE
-#creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
-client_secret = {
-  "type": "service_account",
-  "project_id": "sheetcrafter-316822",
-  "private_key_id": "ed900d99a2ea0081fd0bd8874f2e97812d943d1e",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDt/wgu3nuoQEMW\nytLEURioUZrIB1g3stkLDa2/nDhHq1c1fL2jD/+ZQSmG4pVAxjAUU8cTEIE6G6p5\nj3eD9d5bGEPOUYhxr14qhQJ5HXdsqcjT62hWPCbLjzsgL2N1oHZVJavO1nYuRoy6\nL+5i8H22AEIxOJe2/7eGTzvtW6pNYOGt/fI3SyTgQ9VEiTZOe24G5kWLiW16nsVP\nPIeEuy29fWAC414tnC0CvIRN3DGDysi/OusMe+ehAUC51iN/sYJlvB/GOX0dB+7n\n3ZW5514xGyRsmOb0gPWU1/VnSXY+pfefn8dmjiwGS+DwZJgjzpVo1yep8n74ZkWn\nk3qhgq8rAgMBAAECggEANcdQOQ8LEDzdLBROxg+xK6+s8xA9zfA6/TVtEoQhb4h3\nH139mBAwaJgB4znmEgn2qVE5BcTP/qprviY+EnKHeTwlbkScOVwwQhlmMqoG52YC\nPGjQXdQfzBWkfaRXrCfDNYBar1VkxRYqDJRyIKdJMMwkKO0p0y87cD0NRJhXBj6z\nipI5+7BVuZnDZsedYOrZqlmXWH8EMnYWOpLl5nuGPRAwquRcQpW4kLr+ZZYQt4SD\nMKeO4Tg8ozw1ltORU5yTYPtE+hkdf4iEvW0+U0/9mLLvLoWnOt/WC/WpcWkdL+xF\nWOx3D5yQ9BOpGTXZSDXdKdp/YfEvTvItEX+tn+2XAQKBgQD81K3cZjqb7z0F8LrI\nVaVYqpOdqLTpp2A2jqftpZoSYX4R+9kp502P+mi3HyGj9NUR9hV3wlpY8VTiJ3Cb\neWeMmevtt0oyXJ03mdfA3NhRKLB2KDN/4H4AqCJcd57W/ucP6nWwM1zyE8mSZubb\n5HGJFZmlf/A3nCLxYPDyd5YZgQKBgQDw+r/eiPS2nUOA9PzyEYSQ8L4mecWnUu/b\nM0aua0QVNl+zWAuVon9yK7iUzOCl1hdKPTbQeBymf88RKTiZsEWEgZcC9njrSGT4\n23I9wAdgjPraxdM62XXG5LpYJOIEEJ0w8suIPKeURuR5tFQm8MZ03Py7FPYJDns8\nAsnkSramqwKBgQDsrZOL7M8UxmJTu0S+4R4F4LiLMDEbQaoZqHWfTBTs/ALuhtqG\nFZdQHtQECMqPF1SWmc0C7Rdyh4g0pUMO6Bl9T2HCiICWoIg0Unnce2CsqPB3y65a\nGScbKknwUbKKBNj81zkQlyR9IPTjbhzS4AlAkM3iVd/jzvAPEfa8pCIJAQKBgQCB\nc9J6s0vyhczri7AOQgba7djYRnY9iro7IPKJZCow0wLaDyQ6AA9Cv+XqWZ0cuUPN\np9C4cK3Da8lKyMAVH7JYml0LRGh0zHEhlpFqRqwv28wuljMA3Cz+6YSJMVcRI/Ot\nheB8kUjcyLCYCJ1kRdf2k3hY78uz1cmx1TWro882/QKBgBAG9NFVGCorZuZqvmox\nNGOIluK4NRo9g+YX0ElJb3b8vbe9RSVEg63FrrMQJg8TvP2kMllYGCC5RyuLoBjc\nYiClsN7TKzg/IsJiCiYqBlN3YokEQ8ggHYUhcQMC06Fm0ip1qe1wSLGyWDl03UWm\nJl86Wevb5b6ZVoc6ONDG4TMf\n-----END PRIVATE KEY-----\n",
-  "client_email": "sheetcrafter@sheetcrafter-316822.iam.gserviceaccount.com",
-  "client_id": "106775508412735951836",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/sheetcrafter%40sheetcrafter-316822.iam.gserviceaccount.com"
-}
-creds = ServiceAccountCredentials.from_json_keyfile_dict(client_secret,scope)
+
+if getattr(sys, 'frozen', False):
+    script_dir = os.path.dirname(sys.executable)
+else:
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+client_secret_path = os.path.join(script_dir, 'client_secret.json')
+creds = ServiceAccountCredentials.from_json_keyfile_name(client_secret_path, scope)
+
 client = gspread.authorize(creds)
 datasheet = ''
 ringerboard = ''

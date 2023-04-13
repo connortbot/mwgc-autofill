@@ -11,6 +11,10 @@ import logging
 logging.getLogger().setLevel(logging.DEBUG)
 special_shots_master_list = {}
 
+import os
+import sys
+
+
 def compare_scores(first,second):
     values = []
     for hole, score in enumerate(second):
@@ -403,6 +407,11 @@ label = tk.Label(master=window,textvariable=stringvar,font=labelFont)
 label.pack()
 logging.info("Packed and loaded GUI")
 
-photo = tk.PhotoImage(file = "MWGC_logo.png")
+if getattr(sys, 'frozen', False):
+    script_dir = os.path.dirname(sys.executable)
+else:
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+logo_path = os.path.join(script_dir, 'MWGC_logo.png')
+photo = tk.PhotoImage(file=logo_path)
 window.iconphoto(False,photo)
 window.mainloop()
