@@ -1,10 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
-
+import os
+import sys
+base_path = os.path.abspath(os.path.dirname(sys.argv[0]))
+site_packages_path = os.path.join(sys.base_prefix, "lib", "python" + sys.version[:3], "site-packages")
 
 block_cipher = None
 
 a = Analysis(['main.py'],
-             pathex=[r'C:\Users\MonkeyDumpling\Desktop\mwgc-autofill-main',r'c:\users\monkeydumpling\appdata\local\packages\pythonsoftwarefoundation.python.3.9_qbz5n2kfra8p0\localcache\local-packages\python39\site-packages'],
+             pathex=[base_path, site_packages_path],
              binaries=[],
              datas=[('client_secret.json','.')],
              hiddenimports=[],
