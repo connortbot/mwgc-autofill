@@ -176,8 +176,8 @@ def autofill(progressbar):
                     compare_specials(values, special_shots)
                 batch['range'] = 'C'+str(phdex+3)+':'+'BD'+str(phdex+3)
                 batch['values'] = [values]
+                print(f"LENGTH OF VALUES => {len(values)}")
                 dataspread.batch_update_ringerboard2(dataspread,batch)
-                #break
     ringerboard_scores = dataspread.get_current_scores(dataspread)
     window.update()
     stringvar.set("Updating Best Scores...")
@@ -226,6 +226,7 @@ def autofill(progressbar):
                 range_u = "D"+str(phdex+3)+":"+"U"+str(phdex+3)
                 batch['range'] = range_u
                 batch['values'] = [values]
+                print(f"LENGTH OF VALUES => {len(values)}")
                 dataspread.batch_update_ringerboard(dataspread,batch)
     ixs=[]
     batch=[]
@@ -270,6 +271,7 @@ def autofill(progressbar):
             if name[1] == r_lastname and name[0] == r_firstname:
                 batch.append(new_pb)
                 ixs.append(phdex)
+    print(f"LENGTH OF BATCH => {len(batch)}")
     dataspread.batch_update_cells(dataspread,batch,ixs)
     current_datestr = (date.today()).strftime("%B %d, %Y")
     dataspread.update(dataspread,'A1',"Updated on "+current_datestr)
