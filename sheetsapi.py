@@ -73,10 +73,22 @@ class data_ss:
 
 
     def update(self,cell,text):
-        ringerboard.update(cell,text)
-        ringerboard_specials.update(cell, text)
+        for n in range(max_retries + 1):
+            try:
+                ringerboard.update(cell,text)
+            except gspread.exceptions.APIError as e:
+                exponential_backoff("READ update [SHEET1]",e,n)
+        for n in range(max_retries + 1):
+            try:
+                ringerboard_specials.update(cell, text)
+            except gspread.exceptions.APIError as e:
+                exponential_backoff("READ update [SHEET2]",e,n)
     def get_raw_data(self,timedex):
-        master = datasheet.batch_get(["B3:Z5000"])[0]
+        for n in range(max_retries + 1):
+            try:
+                master = datasheet.batch_get(["B3:Z5000"])[0]
+            except gspread.exceptions.APIError as e:
+                exponential_backoff("READ get_raw_data",e,n)
         processed = []
         for index,entry in enumerate(master):
             if index >= timedex:
@@ -123,52 +135,65 @@ class data_ss:
         return specials_masterlist,score_masterlist,pb_masterlist
     def get_names(self):
         rownum = sheetnames["Row Number"]
-        rnames = ringerboard.batch_get(["A3:B"+rownum],major_dimension='COLUMNS')[0]
-        rfirstnames = rnames[1]
-        rlastnames = rnames[0]
-        rsnames = ringerboard_specials.batch_get(["A3:B"+rownum],major_dimension='COLUMNS')[0]
-        rsfirstnames = rsnames[1]
-        rslastnames = rsnames[0]
+        for n in range(max_retries + 1):
+            try:
+                rnames = ringerboard.batch_get(["A3:B"+rownum],major_dimension='COLUMNS')[0]
+                rfirstnames = rnames[1]
+                rlastnames = rnames[0]
+            except gspread.exceptions.APIError as e:
+                exponential_backoff("READ get_names [SHEET1]",e,n)
+        for n in range(max_retries + 1):
+            try:
+                rsnames = ringerboard_specials.batch_get(["A3:B"+rownum],major_dimension='COLUMNS')[0]
+                rsfirstnames = rsnames[1]
+                rslastnames = rsnames[0]
+            except gspread.exceptions.APIError as e:
+                exponential_backoff("READ get_names [SHEET2]",e,n)
         return rlastnames,rfirstnames,rslastnames,rsfirstnames
-    def get_cell(self,cell):
-        data = ringerboard.get(cell)
-        return data
-    def set_cell(self,cell,value):
-        ringerboard.update(cell,value)
-    def set_cell2(self,cell,value):
-        ringerboard_specials.update(cell,value)
     def get_player_specials(self):
         rownum = sheetnames["Row Number"]
-        sp = ringerboard_specials.batch_get(["B3:BE"+rownum])[0]
-        ph = []
-        for row in sp:
-            row = row[1:55]
-            ph.append(row)
-        return sp
+        for n in range(max_retries + 1):
+            try:
+                sp = ringerboard_specials.batch_get(["B3:BE"+rownum])[0]
+                ph = []
+                for row in sp:
+                    row = row[1:55]
+                    ph.append(row)
+                return sp
+            except gspread.exceptions.APIError as e:
+                exponential_backoff("READ get_player_specials",e,n)
     def get_current_scores(self):
         rownum = sheetnames["Row Number"]
-        sc = ringerboard.batch_get(["D3:V"+rownum])[0]
-        ph = []
-        for row in sc:
-            row = row[:18]
-            ph.append(row)
-        ph = [ph]
-        return ph
+        for n in range(max_retries + 1):
+            try:
+                sc = ringerboard.batch_get(["D3:V"+rownum])[0]
+                ph = []
+                for row in sc:
+                    row = row[:18]
+                    ph.append(row)
+                ph = [ph]
+                return ph
+            except gspread.exceptions.APIError as e:
+                exponential_backoff("READ get_current_scores",e,n)
     def get_current_pb(self):
         rownum = sheetnames["Row Number"]
-        pbs = ringerboard_specials.batch_get(["BH1:BH"+rownum])[0]
-        pbs = pbs[2:]
-        if len(pbs) < (int(rownum)-2):
-            for i in range((int(rownum)-2)-len(pbs)):
-                pbs.append([])
-        return pbs
+        for n in range(max_retries + 1):
+            try:
+                pbs = ringerboard_specials.batch_get(["BH1:BH"+rownum])[0]
+                pbs = pbs[2:]
+                if len(pbs) < (int(rownum)-2):
+                    for i in range((int(rownum)-2)-len(pbs)):
+                        pbs.append([])
+                return pbs
+            except gspread.exceptions.APIError as e:
+                exponential_backoff("READ get_current_pb",e,n)
     def batch_update_ringerboard(self,batch):
         for n in range(max_retries + 1):
             try:
                 ringerboard.batch_update([batch],value_input_option='USER_ENTERED')
                 return
             except gspread.exceptions.APIError as e:
-                exponential_backoff("batch_update_ringerboard",e,n)
+                exponential_backoff("WRITE batch_update_ringerboard",e,n)
         raise Exception(f"Still receiving rate limit errors after {max_retries} retries.")
     def batch_update_ringerboard2(self,batch):
         for n in range(max_retries + 1):
@@ -176,7 +201,7 @@ class data_ss:
                 ringerboard_specials.batch_update([batch],value_input_option='USER_ENTERED')
                 return
             except gspread.exceptions.APIError as e:
-                exponential_backoff("batch_update_ringerboard2",e,n)
+                exponential_backoff("WRITE batch_update_ringerboard2",e,n)
         raise Exception(f"Still receiving rate limit errors after {max_retries} retries.")
     def batch_update_cells(self,batch,ixs):
         rownum = sheetnames["Row Number"]
@@ -190,7 +215,7 @@ class data_ss:
                 ringerboard_specials.update_cells(cell_list,value_input_option='USER_ENTERED')
                 return
             except gspread.exceptions.APIError as e:
-                exponential_backoff("batch_update_cells",e,n)
+                exponential_backoff("WRITE batch_update_cells",e,n)
         raise Exception(f"Still receiving rate limit errors after {max_retries} retries.")
 
 
